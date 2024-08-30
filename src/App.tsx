@@ -1,11 +1,29 @@
 import React from 'react';
 
-import { PauseIcon, PlayIcon, RotateCcwIcon, RotateCwIcon } from 'lucide-react';
+import {
+  PauseIcon,
+  PlayIcon,
+  RotateCcwIcon,
+  RotateCwIcon,
+  Volume1Icon,
+  Volume2Icon,
+  VolumeXIcon,
+} from 'lucide-react';
 import SampleVideo from './video/sample.mp4';
 import SampleSubtitles from './video/sample.vtt';
 
 export default function App() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [volume, setVolume] = React.useState(1);
+
+  const handleVolumeChange = (volume: number) => {
+    if (!videoRef.current) {
+      return;
+    }
+
+    videoRef.current.volume = volume;
+    setVolume(volume);
+  };
 
   const playVideo = React.useCallback(() => {
     videoRef.current?.play();
@@ -45,11 +63,17 @@ export default function App() {
   return (
     <Container>
       <Video ref={videoRef} />
-      <Controls>
-        <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
-        <SeekBackwardButton onSeekBack={seek10Backward} />
-        <SeekForwardButton onSeekForward={seek10Forward} />
-      </Controls>
+      <BottomContainer>
+        <div className="relative h-1 w-full rounded bg-gray-700">
+          <div></div>
+        </div>
+        <Controls>
+          <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
+          <SeekBackwardButton onSeekBack={seek10Backward} />
+          <SeekForwardButton onSeekForward={seek10Forward} />
+          <AudioControl setVolume={handleVolumeChange} volume={volume} />
+        </Controls>
+      </BottomContainer>
     </Container>
   );
 }
@@ -68,6 +92,36 @@ function SeekForwardButton({ onSeekForward }: { onSeekForward: () => void }) {
     <ControlItem onClick={onSeekForward}>
       <RotateCwIcon className="size-6" />
       <span className="sr-only">Seek forward</span>
+    </ControlItem>
+  );
+}
+
+function AudioControl({
+  setVolume,
+  volume,
+}: {
+  setVolume: (volume: number) => void;
+  volume: number;
+}) {
+  const volumeIconToRender = React.useMemo(() => {
+    if (volume === 0) {
+      return <VolumeXIcon className="size-6" />;
+    }
+    if (volume > 0 && volume < 0.5) {
+      return <Volume1Icon className="size-6" />;
+    } else {
+      return <Volume2Icon className="size-6" />;
+    }
+  }, [volume]);
+
+  const toggleMute = React.useCallback(() => {
+    setVolume(volume === 0 ? 1 : 0);
+  }, [setVolume, volume]);
+
+  return (
+    <ControlItem onClick={toggleMute}>
+      {volumeIconToRender}
+      <span className="sr-only">Volume: {volume}</span>
     </ControlItem>
   );
 }
@@ -116,6 +170,10 @@ function Container({ children }: React.PropsWithChildren) {
   );
 }
 
+function BottomContainer({ children }: React.PropsWithChildren) {
+  return <div className="absolute bottom-0 w-full">{children}</div>;
+}
+
 const Video = React.forwardRef<HTMLVideoElement>((_, ref) => {
   return (
     <video ref={ref}>
@@ -132,7 +190,7 @@ const Video = React.forwardRef<HTMLVideoElement>((_, ref) => {
 
 function Controls({ children }: React.PropsWithChildren) {
   return (
-    <ul className="absolute bottom-0 flex w-full items-center gap-1 bg-neutral-950/80 p-1">
+    <ul className="flex w-full items-center gap-2 bg-neutral-950/80 p-1">
       {children}
     </ul>
   );
