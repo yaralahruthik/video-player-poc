@@ -2,7 +2,7 @@ import React from 'react';
 
 import SampleVideo from './video/sample.mp4';
 import SampleSubtitles from './video/sample.vtt';
-import { PauseIcon, PlayIcon } from 'lucide-react';
+import { PauseIcon, PlayIcon, RotateCcwIcon, RotateCwIcon } from 'lucide-react';
 
 export default function App() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -62,11 +62,29 @@ export default function App() {
       {showControls && (
         <Controls>
           <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
-          <ControlItem onClick={seek10Backward}>left 10</ControlItem>
-          <ControlItem onClick={seek10Forward}>right 10</ControlItem>
+          <SeekBackwardButton onSeekBack={seek10Backward} />
+          <SeekForwardButton onSeekForward={seek10Forward} />
         </Controls>
       )}
     </Container>
+  );
+}
+
+function SeekBackwardButton({ onSeekBack }: { onSeekBack: () => void }) {
+  return (
+    <ControlItem onClick={onSeekBack}>
+      <RotateCcwIcon className="size-6" />
+      <span className="sr-only">Seek backward</span>
+    </ControlItem>
+  );
+}
+
+function SeekForwardButton({ onSeekForward }: { onSeekForward: () => void }) {
+  return (
+    <ControlItem onClick={onSeekForward}>
+      <RotateCwIcon className="size-6" />
+      <span className="sr-only">Seek forward</span>
+    </ControlItem>
   );
 }
 
