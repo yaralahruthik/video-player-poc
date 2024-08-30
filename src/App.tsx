@@ -26,6 +26,33 @@ export default function App() {
     videoRef.current?.pause();
   }, [videoRef]);
 
+  const seekTo = React.useCallback(
+    (time: number) => {
+      if (!videoRef.current) {
+        return;
+      }
+
+      videoRef.current.currentTime = time;
+    },
+    [videoRef],
+  );
+
+  const seek10Forward = React.useCallback(() => {
+    if (!videoRef.current) {
+      return;
+    }
+
+    seekTo(videoRef.current.currentTime + 10);
+  }, [seekTo, videoRef]);
+
+  const seek10Backward = React.useCallback(() => {
+    if (!videoRef.current) {
+      return;
+    }
+
+    seekTo(videoRef.current.currentTime - 10);
+  }, [seekTo, videoRef]);
+
   return (
     <Container
       onMouseEnter={() => setIsHovered(true)}
@@ -35,6 +62,8 @@ export default function App() {
       {showControls && (
         <Controls>
           <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
+          <ControlItem onClick={seek10Backward}>left 10</ControlItem>
+          <ControlItem onClick={seek10Forward}>right 10</ControlItem>
         </Controls>
       )}
     </Container>
