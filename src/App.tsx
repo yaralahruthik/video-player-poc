@@ -34,17 +34,46 @@ export default function App() {
       <Video ref={videoRef} />
       {showControls && (
         <Controls>
-          <ControlItem onClick={playVideo}>
-            <PlayIcon className="size-6" fill="white" />{' '}
-            <span className="sr-only">Play</span>
-          </ControlItem>
-          <ControlItem onClick={pauseVideo}>
-            <PauseIcon className="size-6" fill="white" />{' '}
-            <span className="sr-only">Play</span>
-          </ControlItem>
+          <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
         </Controls>
       )}
     </Container>
+  );
+}
+
+function PlayPauseButton({
+  onPlay,
+  onPause,
+}: {
+  onPlay: () => void;
+  onPause: () => void;
+}) {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  const playVideo = React.useCallback(() => {
+    onPlay();
+    setIsPlaying(true);
+  }, [onPlay]);
+
+  const pauseVideo = React.useCallback(() => {
+    onPause();
+    setIsPlaying(false);
+  }, [onPause]);
+
+  return (
+    <>
+      {isPlaying ? (
+        <ControlItem onClick={pauseVideo}>
+          <PauseIcon className="size-6" fill="white" />{' '}
+          <span className="sr-only">Pause</span>
+        </ControlItem>
+      ) : (
+        <ControlItem onClick={playVideo}>
+          <PlayIcon className="size-6" fill="white" />{' '}
+          <span className="sr-only">Play</span>
+        </ControlItem>
+      )}
+    </>
   );
 }
 
@@ -85,7 +114,7 @@ const Video = React.forwardRef<HTMLVideoElement>((_, ref) => {
 
 function Controls({ children }: React.PropsWithChildren) {
   return (
-    <ul className="absolute bottom-0 flex w-full items-center gap-1 bg-neutral-950/15 p-1">
+    <ul className="absolute bottom-0 flex w-full items-center gap-1 bg-neutral-950/80 p-1">
       {children}
     </ul>
   );
@@ -102,7 +131,7 @@ function ControlItem({
   return (
     <li className="flex items-center">
       <button
-        className="scale-95 transition-all hover:scale-100"
+        className="scale-90 transition-all hover:scale-100"
         onClick={onClick}
       >
         {children}
