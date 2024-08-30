@@ -1,22 +1,11 @@
 import React from 'react';
 
+import { PauseIcon, PlayIcon, RotateCcwIcon, RotateCwIcon } from 'lucide-react';
 import SampleVideo from './video/sample.mp4';
 import SampleSubtitles from './video/sample.vtt';
-import { PauseIcon, PlayIcon, RotateCcwIcon, RotateCwIcon } from 'lucide-react';
 
 export default function App() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
-  const [isHovered, setIsHovered] = React.useState(false);
-  const [showControls, setShowControls] = React.useState(false);
-
-  React.useEffect(() => {
-    if (isHovered) {
-      setShowControls(true);
-    } else {
-      const timer = setTimeout(() => setShowControls(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isHovered]);
 
   const playVideo = React.useCallback(() => {
     videoRef.current?.play();
@@ -54,18 +43,13 @@ export default function App() {
   }, [seekTo, videoRef]);
 
   return (
-    <Container
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <Container>
       <Video ref={videoRef} />
-      {showControls && (
-        <Controls>
-          <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
-          <SeekBackwardButton onSeekBack={seek10Backward} />
-          <SeekForwardButton onSeekForward={seek10Forward} />
-        </Controls>
-      )}
+      <Controls>
+        <PlayPauseButton onPlay={playVideo} onPause={pauseVideo} />
+        <SeekBackwardButton onSeekBack={seek10Backward} />
+        <SeekForwardButton onSeekForward={seek10Forward} />
+      </Controls>
     </Container>
   );
 }
@@ -124,22 +108,9 @@ function PlayPauseButton({
   );
 }
 
-type ContainerProps = {
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-};
-
-function Container({
-  children,
-  onMouseEnter,
-  onMouseLeave,
-}: React.PropsWithChildren<ContainerProps>) {
+function Container({ children }: React.PropsWithChildren) {
   return (
-    <figure
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className="relative flex h-svh flex-col justify-center bg-black text-white"
-    >
+    <figure className="relative flex h-svh flex-col justify-center bg-black text-white">
       {children}
     </figure>
   );
