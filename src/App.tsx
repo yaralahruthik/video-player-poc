@@ -1,4 +1,5 @@
 import React from 'react';
+import * as SliderPrimitive from '@radix-ui/react-slider';
 
 import {
   PauseIcon,
@@ -25,40 +26,37 @@ export default function App() {
     setVolume(volume);
   };
 
-  const playVideo = React.useCallback(() => {
+  const playVideo = () => {
     videoRef.current?.play();
-  }, [videoRef]);
+  };
 
-  const pauseVideo = React.useCallback(() => {
+  const pauseVideo = () => {
     videoRef.current?.pause();
-  }, [videoRef]);
+  };
 
-  const seekTo = React.useCallback(
-    (time: number) => {
-      if (!videoRef.current) {
-        return;
-      }
+  const seekTo = (time: number) => {
+    if (!videoRef.current) {
+      return;
+    }
 
-      videoRef.current.currentTime = time;
-    },
-    [videoRef],
-  );
+    videoRef.current.currentTime = time;
+  };
 
-  const seek10Forward = React.useCallback(() => {
+  const seek10Forward = () => {
     if (!videoRef.current) {
       return;
     }
 
     seekTo(videoRef.current.currentTime + 10);
-  }, [seekTo, videoRef]);
+  };
 
-  const seek10Backward = React.useCallback(() => {
+  const seek10Backward = () => {
     if (!videoRef.current) {
       return;
     }
 
     seekTo(videoRef.current.currentTime - 10);
-  }, [seekTo, videoRef]);
+  };
 
   return (
     <Container>
@@ -96,6 +94,27 @@ function SeekForwardButton({ onSeekForward }: { onSeekForward: () => void }) {
   );
 }
 
+export const Slider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+>((props, forwardedRef) => {
+  return (
+    <SliderPrimitive.Root
+      className="relative flex h-5 w-[100px] touch-none select-none items-center"
+      {...props}
+      ref={forwardedRef}
+    >
+      <SliderPrimitive.Track className="relative h-[3px] grow rounded-full bg-black">
+        <SliderPrimitive.Range className="absolute h-full rounded-full bg-white" />
+      </SliderPrimitive.Track>
+      <SliderPrimitive.Thumb
+        className="block h-5 w-5 rounded-[10px] bg-white"
+        aria-label="Volume"
+      />
+    </SliderPrimitive.Root>
+  );
+});
+
 function AudioControl({
   setVolume,
   volume,
@@ -114,13 +133,14 @@ function AudioControl({
     }
   }, [volume]);
 
-  const toggleMute = React.useCallback(() => {
+  const toggleMute = () => {
     setVolume(volume === 0 ? 1 : 0);
-  }, [setVolume, volume]);
+  };
 
   return (
     <ControlItem onClick={toggleMute}>
       {volumeIconToRender}
+      <Slider defaultValue={[33]} max={100} />
       <span className="sr-only">Volume: {volume}</span>
     </ControlItem>
   );
@@ -135,15 +155,15 @@ function PlayPauseButton({
 }) {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
-  const playVideo = React.useCallback(() => {
+  const playVideo = () => {
     onPlay();
     setIsPlaying(true);
-  }, [onPlay]);
+  };
 
-  const pauseVideo = React.useCallback(() => {
+  const pauseVideo = () => {
     onPause();
     setIsPlaying(false);
-  }, [onPause]);
+  };
 
   return (
     <>
